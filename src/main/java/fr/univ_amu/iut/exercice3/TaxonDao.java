@@ -63,6 +63,17 @@ public class TaxonDao {
     // - préparer la requête, puis lier le paramètre `?` au code (méthode setString) ;
     // - exécuter ; si le ResultSet contient une ligne, construire le Taxon avec depuis(rs)
     //   et l'envelopper dans un Optional ; sinon, laisser `resultat` vide.
+    try (Connection connexion = source.getConnection();
+        PreparedStatement ps = connexion.prepareStatement(sql)) {
+      ps.setString(1, code);
+      try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+          resultat = Optional.of(depuis(rs));
+        }
+      }
+    } catch (SQLException e) {
+      throw new DataAccessException("Impossible de lire le taxon", e);
+    }
 
     return resultat;
   }
