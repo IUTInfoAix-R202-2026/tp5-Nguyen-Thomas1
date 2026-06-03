@@ -64,6 +64,50 @@ public class ImportPassageService {
     // 4. finally : refermer la connexion.
     //
     // Astuce : ouvrez la connexion AVANT le try afin de pouvoir faire rollback dans le catch.
+    Connection connexion = null;
+
+    try {
+      connexion = source.getConnection();
+      connexion.setAutoCommit(false);
+
+      try (PreparedStatement psPassage =
+          connexion.prepareStatement(sqlPassage, Statement.RETURN_GENERATED_KEYS)) {
+        psPassage.setString(1, numeroCarre);
+        psPassage.setString(2, codePoint);
+        psPassage.setInt(3, numeroPassage);
+        psPassage.setInt(4, annee);
+        psPassage.executeUpdate();
+
+        try (ResultSet keys = psPassage.getGeneratedKeys()) {
+          if (keys.next()) {
+            passageId = keys.getLong(1);
+          } else {
+            throw new DataAccessException(
+                "Impossible de récupérer l'identifiant du passage",
+                new SQLException("Aucune clé générée"));
+          }
+        }
+      }
+
+      try (PreparedStatement psObservation = connexion.prepareStatement(sqlObservation)) {
+        for (ObservationAImporter observation : observations) {
+          psObservation.setLong(1, passageId);
+          psObservation.setDouble(2, observation.tempsDebut());
+          psObservation.setDouble(3, observation.tempsFin());
+          psObservation.setInt(4, observation.frequenceMediane());
+          psObservation.setString(5, observation.codeTaxon());
+          psObservation.setDouble(6, observation.probabilite());
+          psObservation.executeUpdate();
+        }
+      }
+
+      connexion.commit();
+    } catch (SQLException e) {
+      annulerSilencieusement(connexion);
+      throw new DataAccessException("Impossible d'importer le passage", e);
+    } finally {
+      fermerSilencieusement(connexion);
+    }
 
     return passageId;
   }
