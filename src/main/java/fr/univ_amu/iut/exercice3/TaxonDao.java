@@ -68,7 +68,12 @@ public class TaxonDao {
     // depuis(rs)
     // et l'envelopper dans un Optional ; sinon, laisser `resultat` vide.
     try (Connection connexion = source.getConnection();
+<<<<<<< HEAD
         PreparedStatement ps = connexion.prepareStatement(sql)) {
+=======
+      PreparedStatement ps = connexion.prepareStatement(sql)) {
+      ps.setString(1, code);
+>>>>>>> dfd8bb7 (Exercice 4 terminé)
       try (ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
           resultat = Optional.of(depuis(rs));
