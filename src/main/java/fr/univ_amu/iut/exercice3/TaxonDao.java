@@ -37,7 +37,8 @@ public class TaxonDao {
     // TODO exercice 3 : exécuter le SELECT et construire la liste des Taxon.
     //
     // - ouvrir une connexion (source.getConnection()) dans un try-with-resources ;
-    // - préparer puis exécuter la requête (connexion.prepareStatement(sql), ps.executeQuery()) ;
+    // - préparer puis exécuter la requête (connexion.prepareStatement(sql),
+    // ps.executeQuery()) ;
     // - pour chaque ligne, appeler depuis(rs) et l'ajouter à `taxons`.
     // - en cas de SQLException, lever une DataAccessException.
     try (Connection connexion = source.getConnection();
@@ -58,11 +59,14 @@ public class TaxonDao {
     String sql = "SELECT code, nom_latin, nom_vernaculaire FROM taxon WHERE code = ?";
     Optional<Taxon> resultat = Optional.empty();
 
-    // TODO exercice 3 : exécuter la requête paramétrée et affecter le taxon trouvé à `resultat`.
+    // TODO exercice 3 : exécuter la requête paramétrée et affecter le taxon trouvé
+    // à `resultat`.
     //
-    // - préparer la requête, puis lier le paramètre `?` au code (méthode setString) ;
-    // - exécuter ; si le ResultSet contient une ligne, construire le Taxon avec depuis(rs)
-    //   et l'envelopper dans un Optional ; sinon, laisser `resultat` vide.
+    // - préparer la requête, puis lier le paramètre `?` au code (méthode setString)
+    // ;
+    // - exécuter ; si le ResultSet contient une ligne, construire le Taxon avec
+    // depuis(rs)
+    // et l'envelopper dans un Optional ; sinon, laisser `resultat` vide.
     try (Connection connexion = source.getConnection();
         PreparedStatement ps = connexion.prepareStatement(sql)) {
       ps.setString(1, code);
